@@ -32,7 +32,6 @@ Population.prototype.createMatingPool = function() {
 Population.prototype.reproduce = function() {
   for (var i = 0; i < this.organisms.length; i++) {
     var offspring = new Organism;
-    // debugger;
     var mate1 = getRandom(this.matingPool);
     var mate2 = getRandom(this.matingPool);
     for (var j = 0; j < targetWord.length; j++) {
@@ -42,7 +41,6 @@ Population.prototype.reproduce = function() {
         offspring.dna += mate2.dna.substring(j, j+1);
       }
     }
-    // mutate
     if (Math.random()< this.mutationRate) {
       offspring.mutate();
     }
@@ -61,16 +59,6 @@ Population.prototype.findFittest = function() {
   return fittestOrganism;
 }
 
-Population.prototype.getAllPhrases = function() {
-  var everything = "";
-  var displayLimit = min(this.organisms.length,50);
-
-  for (var i = 0; i < displayLimit; i++) {
-    everything += this.organisms[i].dna + "<br>";
-  }
-  return everything;
-}
-
 Population.prototype.getFitnessValues = function() {
   populationFitnesses = {}
   // debugger;
@@ -84,4 +72,13 @@ Population.prototype.getFitnessValues = function() {
     }
   }
   return populationFitnesses;
+}
+
+Population.prototype.updateAndDisplay = function() {
+  // TODO consolidate the loops through organisms so we aren't looping multiple times
+  for (organism of this.organisms) {
+    organism.applyForce(createVector(.1, .1));
+    organism.move();
+    organism.display();
+  }
 }
