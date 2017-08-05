@@ -1,10 +1,11 @@
 var alphabet = ['a', 'b']
 var population;
+const lifespan = 600;
 
 function setup() {
   createCanvas(600, 600);
-  population = new Population;
-  population.generateInitial(1000);
+  population = new Population(lifespan);
+  population.generateInitial();
 }
 
 function draw() {
@@ -15,8 +16,4 @@ function draw() {
   // population.reproduce();
   // population.generation += 1;
   // console.log(population);
-}
-
-function getRandom(array) {
-  return array[Math.floor(Math.random() * array.length)];
 }

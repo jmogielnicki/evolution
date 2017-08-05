@@ -1,52 +1,53 @@
-function Organism() {
+function Organism(lifespan) {
   this.location = createVector(width/2, height/2);
   this.velocity = createVector(0, 0);
   this.acceleration = createVector(0, 0);
   this.fitness = 0;
   this.score = 0;
-  this.dna = '';
-  this.size = 20;
-  this.mass = 10;
-  this.color = color(100, 100, 100);
+  this.dna = [];
+  this.generateDNA();
+  this.size = 5;
+  this.mass = 200;
+  this.color = color(200, 200, 200, 200);
+  this.timer = 0;
+  this.lifespan = lifespan;
 }
 
-Organism.prototype.generateNew = function(numLetters) {
-  var word = ''
-  for (var i = 0; i < numLetters; i++) {
-    this.dna += alphabet[Math.floor(Math.random() * alphabet.length)];
+Organism.prototype.generateDNA = function() {
+  for (var i = 0; i < 20; i++) {
+    this.dna.push(createVector(random(-1, 1), random(-1, 1)));
   }
 }
 
 Organism.prototype.determineFitness = function() {
-  this.score = 0;
-  for (var i = 0; i < this.dna.length; i++) {
-    letter = this.dna[i];
-    targetLetter = targetWord[i]
-    if (letter == targetLetter) {
-      this.score += 1;
-    }
-  }
-
-  this.fitness = determineFitness(this.score);
+  const distance = dist(this.location.x, this.location.y, mouseX, mouseY);
+  this.fitness = Math.floor(200 - distance);
+  console.log(this.fitness);
 }
 
 Organism.prototype.mutate = function() {
   // pick random letter
-  newLetter = getRandom(alphabet);
-  // console.log('adding ', newLetter, ' to ', this.dna);
-  // mutate random character to be this letter
+  newLetter = random(alphabet);
   dnaArray = this.dna.split('');
   dnaArray[Math.floor(Math.random() * dnaArray.length)] = newLetter;
   this.dna = dnaArray.join('');
-  // console.log('new dna: ', this.dna);
 }
 
 Organism.prototype.display = function() {
-    fill(this.color);
-    ellipse(this.location.x, this.location.y, this.size, this.size)
-  }
+  // noStroke();
+  fill(this.color);
+  ellipse(this.location.x, this.location.y, this.size, this.size)
+}
+
+Organism.prototype.update = function() {
+  this.move();
+  this.timer += 1;
+}
 
 Organism.prototype.move = function() {
+  var interval = this.lifespan/this.dna.length;
+  var index = Math.floor(this.timer/interval);
+  this.applyForce(this.dna[index]);
   this.velocity.add(this.acceleration);
   this.location.add(this.velocity);
   this.acceleration.mult(0)
