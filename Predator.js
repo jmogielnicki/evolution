@@ -1,11 +1,11 @@
 class Predator {
   constructor(x, y) {
-    this.location = createVector(x, y);
-    this.size = 50
+    this.location = e.createVector(x, y);
+    this.size = 80
   }
 
   display() {
-    fill(200, 100, 100);
-    ellipse(this.location.x, this.location.y, this.size, this.size);
+    e.fill(200, 100, 100);
+    e.ellipse(this.location.x, this.location.y, this.size, this.size);
   }
 }

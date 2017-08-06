@@ -1,16 +1,15 @@
 class Organism {
     constructor(lifespan, dnaLength, id) {
-    this.location = createVector(100, height/2);
-    this.velocity = createVector(0, 0);
-    this.acceleration = createVector(0, 0);
+    this.location = e.createVector(100, e.height/2);
+    this.velocity = e.createVector(0, 0);
+    this.acceleration = e.createVector(0, 0);
     this.fitness = 0;
     this.score = 0;
     this.dna = [];
     this.dnaLength = dnaLength;
-    this.generateDNA();
     this.size = 5;
-    this.mass = 6;
-    this.color = color(200, 200, 200, 200);
+    this.mass = 4;
+    this.color = e.color(200, 200, 200, 200);
     this.timer = 0;
     this.lifespan = lifespan;
     this.alive = true;
@@ -18,10 +17,12 @@ class Organism {
     this.id = id;
     this.acheivedGoal = false;
     this.timeToGoal;
+    this.startingDistance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
+    this.generateDNA();
   }
 
   createRandomVector() {
-    return createVector(random(-1, 1), random(-1, 1));
+    return e.createVector(e.random(-1, 1), e.random(-1, 1));
   }
 
   generateDNA() {
@@ -32,12 +33,18 @@ class Organism {
 
   determineFitness() {
     if (this.alive) {
-      const distance = dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
-      this.fitness = Math.floor(pow((400/distance), 4));
-      if (this.frozen) {
-        // If stuck, reduce fitness
-        this.fitness = Math.floor(this.fitness * 0.2);
-      }
+      const distance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
+      // reward getting closer and doing it faster
+      this.fitness = 1000 / distance;
+      // Double fitness if goal is acheived
+      this.fitness = this.acheivedGoal ? this.fitness * 2 : this.fitness;
+      // If stuck, reduce fitness by half
+      this.fitness = this.frozen ? this.fitness * 0.5 : this.fitness;
+      // Increase fitness if finished faster
+      // TODO debug time to goal boost
+      // this.fitness = this.timeToGoal ?
+      //   this.fitness * e.map(this.timeToGoal, 0, this.timer, 4, 1) : this.fitness;
+      this.fitness = e.pow(this.fitness, 4);
     } else {
       this.fitness = 0;
     }
@@ -47,21 +54,40 @@ class Organism {
     }
   }
 
-  mutate() {
-    this.dna[Math.floor(Math.random() * this.dna.length)] = this.createRandomVector();
+  mutate(mutationRate) {
+    for (var i = 0; i < this.dna.length; i++) {
+      if (e.random() <= mutationRate) {
+        this.dna[i] = this.createRandomVector();
+      }
+    }
+  }
+
+  determineColor() {
+    if (!this.alive) {
+      this.color = e.color(0, 0, 0, 0);
+    } else if (this.frozen) {
+      this.color = this.color = e.color(255, 0, 0, 200);
+    } else if (this.acheivedGoal) {
+      this.color = e.color(0, 255, 0, 200);
+    } else {
+      this.color = e.color(200, 200, 200, 200);
+    }
   }
 
   display() {
     // noStroke();
-    fill(this.color);
-    ellipse(this.location.x, this.location.y, this.size, this.size)
+    this.determineColor();
+    e.fill(this.color);
+    e.ellipse(this.location.x, this.location.y, this.size, this.size)
   }
 
   update() {
-    this.move();
-    this.checkPredatorCollision();
-    this.checkAcheivedGoal();
-    this.timer += 1;
+    if (!this.frozen && !this.acheivedGoal && this.alive) {
+      this.move();
+      this.checkPredatorCollision();
+      this.checkAcheivedGoal();
+      this.timer += 1;
+    }
   }
 
   checkAcheivedGoal() {

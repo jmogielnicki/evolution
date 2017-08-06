@@ -1,25 +1,49 @@
 var predators = [];
 var goal;
+var population;
 
-function setup() {
-  createCanvas(800, 600);
-  goal = new Goal(width - 100, height/2);
-  population = new Population(100, 10, 500);
-  population.generateInitial();
-}
+var ecosystem = function( e ) {
 
-function draw() {
-  background(0);
-  for (predator of predators) {
-    predator.display();
+  e.setup = function() {
+    e.createCanvas(800, 600);
+    goal = new Goal(e.width - 100, e.height/2);
+    population = new Population(180, 50, 200);
+    population.generateInitial();
   }
-  goal.display();
-  population.updateAndDisplay();
-  if (predators.length > 5) {
-    population.active = true;
+
+  e.draw = function() {
+    e.background(0);
+    for (predator of predators) {
+      predator.display();
+    }
+    goal.display();
+    population.updateAndDisplay();
+    if (predators.length > 5) {
+      population.active = true;
+    }
+  }
+
+  e.mousePressed = function() {
+    predators.push(new Predator(e.mouseX, e.mouseY))
   }
 }
 
-function mousePressed() {
-  predators.push(new Predator(mouseX, mouseY))
+var e = new p5(ecosystem, 'ecosystem');
+
+var analysis = function( a ) {
+
+  a.setup = function() {
+    a.createCanvas(800, 600);
+  }
+
+  a.draw = function() {
+    a.background(0);
+    // a.fill(200, 200, 200, 200);
+    // for (let i = 0; i < population.history.length; i++) {
+    //   let thisPop = population.history[i];
+    //   a.rect()
+    // }
+  }
 }
+
+var a = new p5(analysis, 'analysis');
