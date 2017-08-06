@@ -1,14 +1,15 @@
 class Population {
-  constructor(lifespan, dnaLength){
-    this.maxSize = 200;
+  constructor(lifespan, dnaLength, maxSize){
+    this.maxSize = maxSize;
     this.organisms = [];
     this.nextGeneration = [];
     this.generation = 0;
-    this.mutationRate = 0.15;
+    this.mutationRate = 0.10;
     this.timer = 0;
     this.lifespan = lifespan;
     this.dnaLength = dnaLength;
     this.totalFitness;
+    this.active = false;
   }
 
   generateInitial() {
@@ -85,20 +86,25 @@ class Population {
     return populationFitnesses;
   }
 
+
   updateAndDisplay() {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
-    this.timer += 1;
-    if (this.timer >= this.lifespan) {
-      this.determineFitness();
-      this.reproduce();
-      this.timer = 0;
-      this.generation += 1;
-      console.log(this);
-      // noLoop();
+    if (this.active) {
+
+      this.timer += 1;
+      if (this.timer >= this.lifespan) {
+        this.determineFitness();
+        this.reproduce();
+        this.timer = 0;
+        this.generation += 1;
+        console.log(this);
+        // noLoop();
+      }
     }
+
     for (const organism of this.organisms) {
       organism.display();
-      if (organism.alive && !organism.frozen) {
+      if (organism.alive && !organism.frozen && this.active) {
         organism.update();
       }
     }

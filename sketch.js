@@ -1,12 +1,10 @@
-const lifespan = 100;
-const dnaLength = 20;
 var predators = [];
 var goal;
 
 function setup() {
-  createCanvas(600, 600);
-  goal = new Goal(20, 20);
-  population = new Population(lifespan, dnaLength);
+  createCanvas(800, 600);
+  goal = new Goal(width - 100, height/2);
+  population = new Population(100, 10, 500);
   population.generateInitial();
 }
 
@@ -15,13 +13,11 @@ function draw() {
   for (predator of predators) {
     predator.display();
   }
-  population.updateAndDisplay();
   goal.display();
-  // population.determineFitness();
-  // population.createMatingPool();
-  // population.reproduce();
-  // population.generation += 1;
-  // console.log(population);
+  population.updateAndDisplay();
+  if (predators.length > 5) {
+    population.active = true;
+  }
 }
 
 function mousePressed() {

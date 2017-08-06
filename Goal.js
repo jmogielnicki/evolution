@@ -1,7 +1,7 @@
 class Goal {
   constructor(x, y) {
     this.location = createVector(x, y);
-    this.size = 40;
+    this.size = 60;
   }
 
   display() {

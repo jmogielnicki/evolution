@@ -1,7 +1,7 @@
 class Predator {
   constructor(x, y) {
     this.location = createVector(x, y);
-    this.size = 20
+    this.size = 50
   }
 
   display() {
