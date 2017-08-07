@@ -5,6 +5,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.sound.min.js"></script>
     <script language="javascript" type="text/javascript" src="../../libraries/p5.play.js"></script>
+    <link rel= "stylesheet" href= "css/main.css">
     <script src="sketch.js"></script>
     <script language="javascript" type="text/javascript" src="Goal.js"></script>
     <script language="javascript" type="text/javascript" src="Predator.js"></script>
@@ -14,8 +15,13 @@
   <style> body {padding: 0; margin: 0;} </style>
   </head>
   <body>
-    <body>
-	<div id="ecosystem"></div> <br>
-	<div id="analysis"></div>
+  <div id="wrapper">
+    <div id="textContainer">
+      <p>A genetic algorithm that learns how to reach a <span id="blue">target</span></p>
+      <p>Click to place at least 6 <span id="red">obstacles</span> to start</p>
+    </div>
+  	<div id="ecosystem"></div> <br>
+  	<div id="analysis"></div>
+  </div>
   </body>
 </html>

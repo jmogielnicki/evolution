@@ -9,6 +9,8 @@ class Population {
     this.lifespan = lifespan;
     this.dnaLength = dnaLength;
     this.totalFitness;
+    this.totalUnstuck;
+    this.totalCompleted = 0;
     this.active = false;
     this.history = [];
     this.numGenerationsForMRBoost = 4;
@@ -24,19 +26,22 @@ class Population {
 
   determineFitness() {
     this.totalFitness = 0;
-    let totalUnstuck = 0;
+    this.totalUnstuck = 0;
+    this.totalCompleted = 0;
     for (const organism of this.organisms) {
       organism.determineFitness();
       this.totalFitness += organism.fitness;
-      totalUnstuck += organism.frozen ? 0 : 1
+      this.totalUnstuck += organism.frozen ? 0 : 1;
+      this.totalCompleted += organism.acheivedGoal ? 1 : 0;
     }
+    console.log('totalCompleted: ', this.totalCompleted);
     // if all members are stuck, boost the mutationRate to 100% for next generation
-    if (totalUnstuck == 0) {
+    if (this.totalUnstuck == 0) {
       this.mutationRate = 1;
     } else if (this.generation % this.numGenerationsForMRBoost == 0) {
       // Every x generations boost the mutationRate for next generation
       console.log('boost to .05');
-      this.mutationRate = .04;
+      this.mutationRate = .015;
     } else {
       this.mutationRate = 0.007
     }
@@ -55,7 +60,13 @@ class Population {
   }
 
   recordHistory() {
-    this.history.push(this.organisms)
+    let historyObj = {};
+    historyObj['totalFitness'] = this.totalFitness;
+    historyObj['totalUnstuck'] = this.totalUnstuck;
+    historyObj['totalOrganisms'] = this.organisms.length;
+    historyObj['totalCompleted'] = this.totalCompleted;
+    historyObj['organisms'] = this.organisms;
+    this.history.push(historyObj)
   }
 
   reproduce() {
@@ -104,6 +115,12 @@ class Population {
     return populationFitnesses;
   }
 
+  updateStats() {
+    const gen = this.generation + 1;
+    const pctComplete = Math.floor(((this.totalCompleted/this.organisms.length) * 100)) + '%';
+    generationText.html('Generation: ' + gen + '  ||   Goal reachers: ' +
+    this.totalCompleted + ' (' + pctComplete + ')')
+  }
 
   updateAndDisplay() {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
@@ -113,6 +130,7 @@ class Population {
       if (this.timer >= this.lifespan) {
         this.determineFitness();
         this.recordHistory();
+        this.updateStats();
         this.reproduce();
         console.log(this);
         // noLoop();

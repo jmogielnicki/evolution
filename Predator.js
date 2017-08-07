@@ -5,7 +5,7 @@ class Predator {
   }
 
   display() {
-    e.fill(200, 100, 100);
+    e.fill(200, 50, 50);
     e.ellipse(this.location.x, this.location.y, this.size, this.size);
   }
 }
