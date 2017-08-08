@@ -34,27 +34,30 @@ class Organism {
   determineFitness() {
     if (this.alive) {
       const distance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
-      // reward getting closer and doing it faster
-      this.fitness = 1000 / distance;
-      // Double fitness if goal is acheived
+      // reward getting closer
+      const distanceFactor = ((distance * -1) + 1000)/10
+      this.fitness = distanceFactor > 0 ? distanceFactor : 0;
+      // reward acheiving goal
       this.fitness = this.acheivedGoal ? this.fitness * 2 : this.fitness;
-      // If stuck, reduce fitness by half
-      this.fitness = this.frozen ? this.fitness * 0.5 : this.fitness;
+      // If stuck, reduce fitness
+      this.fitness = this.frozen ? this.fitness * 0.25 : this.fitness;
       // Increase fitness if finished faster
       // TODO debug time to goal boost
-      // this.fitness = this.timeToGoal ?
-      //   this.fitness * e.map(this.timeToGoal, 0, this.timer, 4, 1) : this.fitness;
-      this.fitness = e.pow(this.fitness, 4);
+      this.fitness = this.timeToGoal ?
+        this.fitness * e.map(this.timeToGoal, 0, this.timer, 100, 1) : this.fitness;
+      if (!this.fitness || this.fitness < 0) {
+        this.fitness = 0;
+      }
+      this.fitness = e.pow(this.fitness, 10);
     } else {
       this.fitness = 0;
     }
     // Safeguard against negative or undefinted fitness (will break mating pool)
-    if (!this.fitness || this.fitness < 0) {
-      this.fitness = 0;
-    }
+
   }
 
   mutate(mutationRate) {
+    console.log(mutationRate);
     for (var i = 0; i < this.dna.length; i++) {
       if (e.random() <= mutationRate) {
         this.dna[i] = this.createRandomVector();
@@ -76,6 +79,7 @@ class Organism {
 
   display() {
     // noStroke();
+    // this.size = e.map(this.fitness, 0, 10000000000000000000, 3, 30);
     this.determineColor();
     e.fill(this.color);
     e.ellipse(this.location.x, this.location.y, this.size, this.size)
@@ -84,6 +88,7 @@ class Organism {
   update() {
     if (!this.frozen && !this.acheivedGoal && this.alive) {
       this.move();
+      this.determineFitness();
       this.checkPredatorCollision();
       this.checkAcheivedGoal();
       this.timer += 1;

@@ -17,3 +17,11 @@ p {
 #red {
   color: rgb(200, 80, 80)
 }
+
+#textContainer {
+  display: inline-block;
+}
+
+#sliderContainer {
+  display: inline-block;
+}

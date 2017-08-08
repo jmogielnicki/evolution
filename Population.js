@@ -9,6 +9,8 @@ class Population {
     this.lifespan = lifespan;
     this.dnaLength = dnaLength;
     this.totalFitness;
+    this.maxFitness = 0;
+    this.fastestTime;
     this.totalUnstuck;
     this.totalCompleted = 0;
     this.active = false;
@@ -30,6 +32,9 @@ class Population {
     this.totalCompleted = 0;
     for (const organism of this.organisms) {
       organism.determineFitness();
+      if (organism.fitness > this.maxFitness) {
+        this.maxFitness = organism.fitness;
+      }
       this.totalFitness += organism.fitness;
       this.totalUnstuck += organism.frozen ? 0 : 1;
       this.totalCompleted += organism.acheivedGoal ? 1 : 0;
@@ -41,9 +46,9 @@ class Population {
     } else if (this.generation % this.numGenerationsForMRBoost == 0) {
       // Every x generations boost the mutationRate for next generation
       console.log('boost to .05');
-      this.mutationRate = .015;
+      this.mutationRate = .007;
     } else {
-      this.mutationRate = 0.007
+      this.mutationRate = 0.002
     }
   }
 
@@ -63,7 +68,6 @@ class Population {
     let historyObj = {};
     historyObj['totalFitness'] = this.totalFitness;
     historyObj['totalUnstuck'] = this.totalUnstuck;
-    historyObj['totalOrganisms'] = this.organisms.length;
     historyObj['totalCompleted'] = this.totalCompleted;
     historyObj['organisms'] = this.organisms;
     this.history.push(historyObj)
@@ -82,7 +86,7 @@ class Population {
           offspring.dna[j] = mate2.dna[j];
         }
       }
-      offspring.mutate(this.mutationRate);
+      offspring.mutate(baseMutationRate);
       this.nextGeneration.push(offspring);
     }
     this.organisms = this.nextGeneration;
@@ -116,31 +120,40 @@ class Population {
   }
 
   updateStats() {
-    const gen = this.generation + 1;
+    const lastGeneration = this.history[this.history.length]
+    const genNum = this.history ? this.history.length : 0;
+    const spacer = '<br>'
     const pctComplete = Math.floor(((this.totalCompleted/this.organisms.length) * 100)) + '%';
-    generationText.html('Generation: ' + gen + '  ||   Goal reachers: ' +
-    this.totalCompleted + ' (' + pctComplete + ')')
+    const numDied = this.totalUnstuck ? this.organisms.length - this.totalUnstuck : 0;
+    const pctDied = Math.floor(((numDied/this.organisms.length) * 100)) + '%';
+    generationText.html(
+      'Generation: ' + genNum + spacer +
+      'Total Population: ' + this.organisms.length + spacer +
+      '# successful: ' + this.totalCompleted + ' (' + pctComplete + ')' + spacer +
+      '# died: ' + numDied + ' (' + pctDied + ')'
+      )
   }
 
   updateAndDisplay() {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
     if (this.active) {
-
       this.timer += 1;
-      if (this.timer >= this.lifespan) {
+      if (this.timer >= this.lifespan + this.organisms.length) {
         this.determineFitness();
         this.recordHistory();
-        this.updateStats();
         this.reproduce();
+        this.updateStats();
         console.log(this);
         // noLoop();
       }
     }
-
-    for (const organism of this.organisms) {
+    for (var i = 0; i < this.organisms.length; i++) {
+      let organism = this.organisms[i]
       organism.display();
-      if (this.active) {
-        organism.update();
+      if (this.active && organism.timer < organism.lifespan) {
+        if (i < this.timer) {
+          organism.update();
+        }
       }
     }
   }

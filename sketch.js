@@ -1,22 +1,23 @@
 var predators = [];
 var goal;
 var population;
-var generationText;
+var generationText, mutationRateText, mutationRateSlider;
+var onCanvas;
+var gui;
+var baseMutationRate = 0.001;
+var mutationRateType = ['automatic', 'manual'];
+var guiVisible;
 
 var ecosystem = function( e ) {
-
-  e.createSummaryText = function() {
-    generationText = e.createP('Generation: ' + population.generation);
-    generationText.addClass('generationText');
-    generationText.parent('textContainer');
-  }
-
   e.setup = function() {
-    e.createCanvas(a.windowWidth, 600);
+    canvas = e.createCanvas(a.windowWidth, 600);
+    canvas.mouseOver(function() { onCanvas = true; });
+    canvas.mouseOut( function() { onCanvas = false; });
     goal = new Goal(e.width - 100, e.height/2);
-    population = new Population(180, 50, 200);
+    population = new Population(240, 100, 400);
     population.generateInitial();
     e.createSummaryText();
+
   }
 
   e.draw = function() {
@@ -26,13 +27,36 @@ var ecosystem = function( e ) {
     }
     goal.display();
     population.updateAndDisplay();
-    if (predators.length > 5) {
+    if (predators.length > 3) {
       population.active = true;
     }
   }
 
   e.mousePressed = function() {
-    predators.push(new Predator(e.mouseX, e.mouseY))
+    if (onCanvas) {
+      predators.push(new Predator(e.mouseX, e.mouseY))
+    }
+  }
+
+  e.keyPressed = function() {
+    switch(e.keyCode) {
+      // type [F1] to hide / show the GUI
+      case e.RETURN:
+        guiVisible = !guiVisible;
+        if(guiVisible) gui.show(); else gui.hide();
+        break;
+    }
+  }
+
+  e.createSummaryText = function() {
+    generationText = e.createP('');
+    generationText.addClass('generationText');
+    generationText.parent('textContainer');
+    population.updateStats();
+    e.sliderRange(0.001, 0.5, 0.001);
+    gui = e.createGui('controls');
+    gui.addGlobals('baseMutationRate');
+    gui.hide();
   }
 }
 
