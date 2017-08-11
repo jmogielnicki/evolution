@@ -11,12 +11,12 @@ class Organism {
     this.mass = 4;
     this.color = e.color(200, 200, 200, 200);
     this.timer = 0;
+    this.timeToGoal = 0;
     this.lifespan = lifespan;
     this.alive = true;
     this.frozen = false;
     this.id = id;
     this.acheivedGoal = false;
-    this.timeToGoal;
     this.startingDistance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
     this.generateDNA();
   }
@@ -35,20 +35,31 @@ class Organism {
     if (this.alive) {
       const distance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
       // reward getting closer
-      const distanceFactor = ((distance * -1) + 1000)/10
+      // const distanceFactor = ((distance * -1) + 1000)/10
+      const distanceFactor = e.map(distance, 1000, 1, 1, 4);
       this.fitness = distanceFactor > 0 ? distanceFactor : 0;
+
+      // Increase fitness if finished faster
+      let timeToGoalFactor = e.map(this.timeToGoal, this.timer, 0, 1, 2);
+      timeToGoalFactor = e.pow(timeToGoalFactor, 2);
+      this.fitness = this.fitness * timeToGoalFactor
+
       // reward acheiving goal
       this.fitness = this.acheivedGoal ? this.fitness * 2 : this.fitness;
+
       // If stuck, reduce fitness
-      this.fitness = this.frozen ? this.fitness * 0.25 : this.fitness;
-      // Increase fitness if finished faster
+      this.fitness = this.frozen ? this.fitness * 0.0001 : this.fitness;
+
       // TODO debug time to goal boost
-      this.fitness = this.timeToGoal ?
-        this.fitness * e.map(this.timeToGoal, 0, this.timer, 100, 1) : this.fitness;
+      // this.fitness = this.timeToGoal ?
+      //   this.fitness * e.map(this.timeToGoal, this.timer, 0, 1, 2) : this.fitness;
+
+
       if (!this.fitness || this.fitness < 0) {
         this.fitness = 0;
       }
-      this.fitness = e.pow(this.fitness, 10);
+
+      this.fitness = e.pow(this.fitness, 2);
     } else {
       this.fitness = 0;
     }
@@ -79,26 +90,31 @@ class Organism {
 
   display() {
     // noStroke();
-    // this.size = e.map(this.fitness, 0, 10000000000000000000, 3, 30);
+    this.size = this.fitness;
     this.determineColor();
     e.fill(this.color);
     e.ellipse(this.location.x, this.location.y, this.size, this.size)
+
+    e.textSize(8);
+    e.fill(250, 250, 250);
+    e.text(this.fitness.toFixed(2), this.location.x, this.location.y);
   }
 
   update() {
+    this.determineFitness();
     if (!this.frozen && !this.acheivedGoal && this.alive) {
       this.move();
-      this.determineFitness();
       this.checkPredatorCollision();
       this.checkAcheivedGoal();
+      // TODO: move timer outside of if block so that it keeps going even if goal acheived?
       this.timer += 1;
+      this.timeToGoal += this.acheivedGoal ? 0 : 1;
     }
   }
 
   checkAcheivedGoal() {
     if (colliding(this, goal) && this.acheivedGoal == false) {
       this.acheivedGoal = true;
-      this.timeToGoal = this.timer;
     }
   }
 
