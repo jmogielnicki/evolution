@@ -39,13 +39,20 @@ class Organism {
       const distanceFactor = e.map(distance, 1000, 1, 1, 4);
       this.fitness = distanceFactor > 0 ? distanceFactor : 0;
 
-      // Increase fitness if finished faster
-      let timeToGoalFactor = e.map(this.timeToGoal, this.timer, 0, 1, 2);
-      timeToGoalFactor = e.pow(timeToGoalFactor, 2);
-      this.fitness = this.fitness * timeToGoalFactor
-
       // reward acheiving goal
       this.fitness = this.acheivedGoal ? this.fitness * 2 : this.fitness;
+
+      // Boost fitness if finished faster than fastest time
+      if (this.acheivedGoal) {
+        const amountFaster = population.fastestTime - this.timeToGoal;
+        if (amountFaster > 1) {
+          // If faster, boost fitness
+          this.fitness = this.fitness * amountFaster;
+        } else if (amountFaster < 0) {
+          // If slower than fastest, reduce fitness by half
+          this.fitness = this.fitness * 0.5
+        }
+      }
 
       // If stuck, reduce fitness
       this.fitness = this.frozen ? this.fitness * 0.0001 : this.fitness;
@@ -59,7 +66,7 @@ class Organism {
         this.fitness = 0;
       }
 
-      this.fitness = e.pow(this.fitness, 2);
+      this.fitness = e.pow(this.fitness, 4);
     } else {
       this.fitness = 0;
     }
@@ -90,18 +97,29 @@ class Organism {
 
   display() {
     // noStroke();
-    this.size = this.fitness;
+    // Use fitness to calculate area of circle.  Calculate diameter from area.
+    let diameter;
+    if (context.debug) {
+      const area = e.map(this.fitness, 0, 100, 0, 100)
+      diameter = e.sqrt(area/e.PI) * 2;
+    } else {
+      diameter = this.size
+    }
+
     this.determineColor();
     e.fill(this.color);
-    e.ellipse(this.location.x, this.location.y, this.size, this.size)
+    e.ellipse(this.location.x, this.location.y, diameter, diameter)
 
-    e.textSize(8);
-    e.fill(250, 250, 250);
-    e.text(this.fitness.toFixed(2), this.location.x, this.location.y);
+    if (context.debug) {
+      e.textSize(8);
+      e.fill(250, 250, 250);
+      const text = this.fitness.toFixed(0);
+      e.text(text, this.location.x, this.location.y);
+    }
   }
 
   update() {
-    this.determineFitness();
+    context.debug ? this.determineFitness() : null;
     if (!this.frozen && !this.acheivedGoal && this.alive) {
       this.move();
       this.checkPredatorCollision();

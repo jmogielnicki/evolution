@@ -35,6 +35,11 @@ class Population {
       if (organism.fitness > this.maxFitness) {
         this.maxFitness = organism.fitness;
       }
+      if (organism.acheivedGoal) {
+        if (!this.fastestTime || organism.timeToGoal < this.fastestTime) {
+          this.fastestTime = organism.timeToGoal;
+        }
+      }
       this.totalFitness += organism.fitness;
       this.totalUnstuck += organism.frozen ? 0 : 1;
       this.totalCompleted += organism.acheivedGoal ? 1 : 0;

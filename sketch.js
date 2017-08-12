@@ -7,6 +7,9 @@ var gui;
 var baseMutationRate = 0.001;
 var mutationRateType = ['automatic', 'manual'];
 var guiVisible;
+var context = {
+  debug: true,
+};
 
 var ecosystem = function( e ) {
   e.setup = function() {
