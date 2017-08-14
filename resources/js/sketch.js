@@ -7,6 +7,7 @@ var gui;
 var baseMutationRate = 0.01;
 var debugMode = false;
 var historyMode = false;
+var showPaths = false;
 var mutationRateType = ['automatic', 'manual'];
 var guiVisible;
 var paused = true;
@@ -23,7 +24,8 @@ var ecosystem = function( e ) {
   }
 
   e.draw = function() {
-    e.background(0);
+    let transparency = showPaths ? 3 : 100;
+    e.background(0, 0, 0, transparency);
     for (predator of predators) {
       predator.display();
     }
@@ -43,11 +45,22 @@ var ecosystem = function( e ) {
   }
 
   e.keyPressed = function() {
-    switch(e.keyCode) {
+    var keyCode = e.keyCode;
+    switch(true) {
       // type [F1] to hide / show the GUI
-      case e.RETURN:
+      case keyCode == e.RETURN:
         guiVisible = !guiVisible;
         if(guiVisible) gui.show(); else gui.hide();
+        break;
+      case keyCode == 72:
+        historyMode = !historyMode;
+        break;
+      case keyCode == 68:
+        debugMode = !debugMode;
+        break;
+      case keyCode >= 49 && keyCode <= 57:
+        let numberPressed = keyCode - 48;
+        baseMutationRate = numberPressed / 100;
         break;
     }
   }
@@ -69,6 +82,7 @@ var ecosystem = function( e ) {
     gui.addGlobals('baseMutationRate');
     gui.addGlobals('debugMode');
     gui.addGlobals('historyMode');
+    gui.addGlobals('showPaths');
     gui.hide();
   }
 }

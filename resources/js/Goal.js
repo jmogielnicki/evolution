@@ -6,7 +6,7 @@ class Goal {
 
   display() {
     e.fill(100, 130, 150);
-    e.stroke(255, 255, 255, 30);
+    e.stroke(255, 255, 255, 70);
     e.ellipse(this.location.x, this.location.y, this.size, this.size);
     if (debugMode && population.history.length > 0) {
       e.fill(100, 130, 150, 10)

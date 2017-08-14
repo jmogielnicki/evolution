@@ -149,7 +149,24 @@ class Population {
         let transparency = e.map(i, 0, this.history.length, 50, 200)
         for (let organismLocation of fittestOrganism.locationHistory) {
           e.fill(255, transparency);
+          e.noStroke();
           e.ellipse(organismLocation.x, organismLocation.y, fittestOrganism.size, fittestOrganism.size);
+        }
+      }
+    }
+  }
+
+  displayAllHistory() {
+    if (this.history && this.history.length > 0) {
+      for (var i = 0; i < this.history.length; i++) {
+        let organisms = this.history[i].organisms;
+        for (var j = 0; j < organisms.length; j++) {
+          let organismHistory = organisms[j].locationHistory;
+          for (let organismLocation of organismHistory) {
+            e.fill(255, 1);
+            e.noStroke()
+            e.ellipse(organismLocation.x, organismLocation.y, organisms[j].size, organisms[j].size);
+          }
         }
       }
     }

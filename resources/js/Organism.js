@@ -99,7 +99,7 @@ class Organism {
     } else if (this.acheivedGoal) {
       this.color = e.color(0, 255, 0, 200);
     } else {
-      this.color = e.color(200, 200, 200, 200);
+      this.color = e.color(250, 250, 250, 250);
     }
   }
 
@@ -110,6 +110,7 @@ class Organism {
 
     this.determineColor();
     e.fill(this.color);
+    e.stroke(0);
     e.ellipse(this.location.x, this.location.y, diameter, diameter)
 
     if (debugMode) {
