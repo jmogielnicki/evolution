@@ -16,7 +16,7 @@ var ecosystem = function( e ) {
     canvas.mouseOver(function() { onCanvas = true; });
     canvas.mouseOut( function() { onCanvas = false; });
     goal = new Goal(e.width - 100, e.height/2);
-    population = new Population(240, 100, 400);
+    population = new Population(240, 100, 500);
     population.generateInitial();
     e.createSummaryText();
 
