@@ -1,6 +1,6 @@
 class Organism {
-    constructor(lifespan, dnaLength, id) {
-    this.location = e.createVector(100, e.height/2);
+    constructor(lifespan, dnaLength, id, startingLocation) {
+    this.location = e.createVector(startingLocation.x, startingLocation.y);
     this.velocity = e.createVector(0, 0);
     this.acceleration = e.createVector(0, 0);
     this.fitness = 0;
@@ -18,6 +18,9 @@ class Organism {
     this.id = id;
     this.acheivedGoal = false;
     this.startingDistance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
+    this.distanceToGoal;
+    this.distanceTravelled = 0;
+    this.lastLocation = e.createVector(this.location.x, this.location.y);
     this.generateDNA();
   }
 
@@ -33,16 +36,24 @@ class Organism {
 
   determineFitness() {
     if (this.alive) {
-      const distance = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
+      this.distanceToGoal = e.dist(this.location.x, this.location.y, goal.location.x, goal.location.y);
       // reward getting closer
-      // const distanceFactor = ((distance * -1) + 1000)/10
-      const distanceFactor = e.map(distance, 1000, 1, 1, 4);
+      const distanceFactor = e.map(this.distanceToGoal, this.startingDistance, 1, 1, 20);
       this.fitness = distanceFactor > 0 ? distanceFactor : 0;
 
-      // reward acheiving goal
-      this.fitness = this.acheivedGoal ? this.fitness * 2 : this.fitness;
+      if (population.history.length > 0) {
+        const lastGeneration = population.history[population.history.length - 1]
+        // Add extra reward for beating the current closest distance
+        this.fitness = this.distanceToGoal < lastGeneration.closestDistance ? this.fitness * 6 : this.fitness;
+        // Reward travelling longest distance
+        this.fitness = this.distanceTravelled > lastGeneration.longestDistance ? this.fitness * 4 : this.fitness;
+      }
 
-      // Boost fitness if finished faster than fastest time
+
+      // reward acheiving goal
+      this.fitness = this.acheivedGoal ? this.fitness * 6 : this.fitness;
+
+      // Reward acheiving goal faster than current fastest time
       if (this.acheivedGoal) {
         const amountFaster = population.fastestTime - this.timeToGoal;
         if (amountFaster > 1) {
@@ -55,13 +66,9 @@ class Organism {
       }
 
       // If stuck, reduce fitness
-      this.fitness = this.frozen ? this.fitness * 0.0001 : this.fitness;
+      this.fitness = this.frozen ? this.fitness * 0.3 : this.fitness;
 
-      // TODO debug time to goal boost
-      // this.fitness = this.timeToGoal ?
-      //   this.fitness * e.map(this.timeToGoal, this.timer, 0, 1, 2) : this.fitness;
-
-
+      // Check for negative values, set to 0
       if (!this.fitness || this.fitness < 0) {
         this.fitness = 0;
       }
@@ -75,7 +82,6 @@ class Organism {
   }
 
   mutate(mutationRate) {
-    console.log(mutationRate);
     for (var i = 0; i < this.dna.length; i++) {
       if (e.random() <= mutationRate) {
         this.dna[i] = this.createRandomVector();
@@ -98,30 +104,36 @@ class Organism {
   display() {
     // noStroke();
     // Use fitness to calculate area of circle.  Calculate diameter from area.
-    let diameter;
-    if (context.debug) {
-      const area = e.map(this.fitness, 0, 100, 0, 100)
-      diameter = e.sqrt(area/e.PI) * 2;
-    } else {
-      diameter = this.size
+    let diameter = this.size;
+    if (debugMode) {
+      // const area = e.map(this.fitness, 0, 100, 0, 100)
+      // diameter = e.sqrt(area/e.PI) * 2;
     }
 
     this.determineColor();
     e.fill(this.color);
     e.ellipse(this.location.x, this.location.y, diameter, diameter)
 
-    if (context.debug) {
-      e.textSize(8);
+    if (debugMode) {
+      e.textSize(10);
       e.fill(250, 250, 250);
       const text = this.fitness.toFixed(0);
       e.text(text, this.location.x, this.location.y);
     }
   }
 
+  calculateDistanceTravelled() {
+    const incrementalDistance = e.dist(this.lastLocation.x, this.lastLocation.y, this.location.x, this.location.y);
+    this.distanceTravelled += incrementalDistance;
+    this.lastLocation.x = this.location.x;
+    this.lastLocation.y = this.location.y;
+  }
+
   update() {
-    context.debug ? this.determineFitness() : null;
+    debugMode ? this.determineFitness() : null;
     if (!this.frozen && !this.acheivedGoal && this.alive) {
       this.move();
+      this.calculateDistanceTravelled();
       this.checkPredatorCollision();
       this.checkAcheivedGoal();
       // TODO: move timer outside of if block so that it keeps going even if goal acheived?

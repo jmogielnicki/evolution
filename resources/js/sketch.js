@@ -1,15 +1,14 @@
 var predators = [];
 var goal;
 var population;
-var generationText, mutationRateText, mutationRateSlider;
+var generationText, mutationRateText, mutationRateSlider, startButton;
 var onCanvas;
 var gui;
-var baseMutationRate = 0.001;
+var baseMutationRate = 0.01;
+var debugMode = false;
 var mutationRateType = ['automatic', 'manual'];
 var guiVisible;
-var context = {
-  debug: true,
-};
+var paused = true;
 
 var ecosystem = function( e ) {
   e.setup = function() {
@@ -30,7 +29,9 @@ var ecosystem = function( e ) {
     }
     goal.display();
     population.updateAndDisplay();
-    if (predators.length > 3) {
+    if (paused) {
+      population.active = false;
+    } else {
       population.active = true;
     }
   }
@@ -51,14 +52,22 @@ var ecosystem = function( e ) {
     }
   }
 
+  pause = function() {
+    paused = !paused;
+  }
+
   e.createSummaryText = function() {
     generationText = e.createP('');
     generationText.addClass('generationText');
     generationText.parent('textContainer');
+    startButton = e.createButton('play/pause')
+    startButton.parent('textContainer');
+    startButton.mousePressed(pause);
     population.updateStats();
     e.sliderRange(0.001, 0.5, 0.001);
     gui = e.createGui('controls');
     gui.addGlobals('baseMutationRate');
+    gui.addGlobals('debugMode');
     gui.hide();
   }
 }

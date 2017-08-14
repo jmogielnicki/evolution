@@ -7,11 +7,14 @@ class Population {
     this.mutationRate = 0.01;
     this.timer = 0;
     this.lifespan = lifespan;
+    this.startingLocation = {x: 100, y: e.height/2};
     this.dnaLength = dnaLength;
     this.totalFitness;
     this.maxFitness = 0;
     this.fastestTime;
     this.totalUnstuck;
+    this.closestDistance;
+    this.longestDistance;
     this.totalCompleted = 0;
     this.active = false;
     this.history = [];
@@ -20,40 +23,51 @@ class Population {
 
   generateInitial() {
     for (let i = 0; i < this.maxSize; i++) {
-      // debugger;
-      let organism = new Organism(this.lifespan, this.dnaLength, i);
+      let organism = new Organism(this.lifespan, this.dnaLength, i, this.startingLocation);
       this.organisms.push(organism);
     }
+  }
+
+  calculatePopulationStats(organism) {
+    if (organism.fitness > this.maxFitness) {
+      this.maxFitness = organism.fitness;
+    }
+    if (organism.acheivedGoal) {
+      if (!this.fastestTime || organism.timeToGoal < this.fastestTime) {
+        this.fastestTime = organism.timeToGoal;
+      }
+    }
+    if (!this.closestDistance || organism.distanceToGoal < this.closestDistance) {
+      this.closestDistance = organism.distanceToGoal;
+    }
+    if (!this.longestDistance || organism.distanceTravelled > this.longestDistance) {
+      this.longestDistance = organism.distanceTravelled;
+    }
+    this.totalFitness += organism.fitness;
+    this.totalUnstuck += organism.frozen ? 0 : 1;
+    this.totalCompleted += organism.acheivedGoal ? 1 : 0;
   }
 
   determineFitness() {
     this.totalFitness = 0;
     this.totalUnstuck = 0;
     this.totalCompleted = 0;
+    this.fastestTime = 0;
+    this.maxFitness = 0;
+    this.closestDistance = undefined;
+    this.longestDistance = undefined;
     for (const organism of this.organisms) {
       organism.determineFitness();
-      if (organism.fitness > this.maxFitness) {
-        this.maxFitness = organism.fitness;
-      }
-      if (organism.acheivedGoal) {
-        if (!this.fastestTime || organism.timeToGoal < this.fastestTime) {
-          this.fastestTime = organism.timeToGoal;
-        }
-      }
-      this.totalFitness += organism.fitness;
-      this.totalUnstuck += organism.frozen ? 0 : 1;
-      this.totalCompleted += organism.acheivedGoal ? 1 : 0;
+      this.calculatePopulationStats(organism);
     }
-    console.log('totalCompleted: ', this.totalCompleted);
     // if all members are stuck, boost the mutationRate to 100% for next generation
     if (this.totalUnstuck == 0) {
       this.mutationRate = 1;
     } else if (this.generation % this.numGenerationsForMRBoost == 0) {
       // Every x generations boost the mutationRate for next generation
-      console.log('boost to .05');
-      this.mutationRate = .007;
+      this.mutationRate = .05;
     } else {
-      this.mutationRate = 0.002
+      this.mutationRate = 0.01
     }
   }
 
@@ -70,17 +84,13 @@ class Population {
   }
 
   recordHistory() {
-    let historyObj = {};
-    historyObj['totalFitness'] = this.totalFitness;
-    historyObj['totalUnstuck'] = this.totalUnstuck;
-    historyObj['totalCompleted'] = this.totalCompleted;
-    historyObj['organisms'] = this.organisms;
-    this.history.push(historyObj)
+    const thisCopy = Object.assign({}, this);
+    this.history.push(thisCopy)
   }
 
   reproduce() {
     for (let i = 0; i < this.organisms.length; i++) {
-      let offspring = new Organism(this.lifespan);
+      let offspring = new Organism(this.lifespan, this.dnaLength, i, this.startingLocation);
       let mate1 = this.getOrganismFromMatingPool();
       let mate2 = this.getOrganismFromMatingPool();
       for (let j = 0; j < this.dnaLength; j++) {
@@ -91,7 +101,7 @@ class Population {
           offspring.dna[j] = mate2.dna[j];
         }
       }
-      offspring.mutate(baseMutationRate);
+      offspring.mutate(guiVisible ? baseMutationRate : this.mutationRate);
       this.nextGeneration.push(offspring);
     }
     this.organisms = this.nextGeneration;
@@ -143,6 +153,7 @@ class Population {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
     if (this.active) {
       this.timer += 1;
+      // Generation lifespan is over
       if (this.timer >= this.lifespan + this.organisms.length) {
         this.determineFitness();
         this.recordHistory();
