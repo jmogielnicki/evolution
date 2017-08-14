@@ -19,6 +19,7 @@ class Population {
     this.active = false;
     this.history = [];
     this.numGenerationsForMRBoost = 4;
+    this.fittestOrganism;
   }
 
   generateInitial() {
@@ -31,6 +32,7 @@ class Population {
   calculatePopulationStats(organism) {
     if (organism.fitness > this.maxFitness) {
       this.maxFitness = organism.fitness;
+      this.fittestOrganism = organism;
     }
     if (organism.acheivedGoal) {
       if (!this.fastestTime || organism.timeToGoal < this.fastestTime) {
@@ -110,16 +112,6 @@ class Population {
     this.timer = 0;
   }
 
-  findFittest() {
-    const fittestOrganism = {fitness: -1}
-    for (organism of this.organisms) {
-      if (organism.fitness > fittestOrganism.fitness) {
-        fittestOrganism = organism;
-      }
-    }
-    return fittestOrganism;
-  }
-
   getFitnessValues() {
     populationFitnesses = {}
     for (organism of this.organisms) {
@@ -149,6 +141,20 @@ class Population {
       )
   }
 
+  displayHistory() {
+    // historical view
+    if (this.history && this.history.length > 0) {
+      for (var i = 0; i < this.history.length; i++) {
+        let fittestOrganism = this.history[i].fittestOrganism;
+        let transparency = e.map(i, 0, this.history.length, 50, 200)
+        for (let organismLocation of fittestOrganism.locationHistory) {
+          e.fill(255, transparency);
+          e.ellipse(organismLocation.x, organismLocation.y, fittestOrganism.size, fittestOrganism.size);
+        }
+      }
+    }
+  }
+
   updateAndDisplay() {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
     if (this.active) {
@@ -163,6 +169,10 @@ class Population {
         // noLoop();
       }
     }
+    if (historyMode) {
+      this.displayHistory();
+    }
+    // display only latest generation
     for (var i = 0; i < this.organisms.length; i++) {
       let organism = this.organisms[i]
       organism.display();

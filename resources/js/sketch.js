@@ -6,6 +6,7 @@ var onCanvas;
 var gui;
 var baseMutationRate = 0.01;
 var debugMode = false;
+var historyMode = false;
 var mutationRateType = ['automatic', 'manual'];
 var guiVisible;
 var paused = true;
@@ -19,7 +20,6 @@ var ecosystem = function( e ) {
     population = new Population(240, 100, 500);
     population.generateInitial();
     e.createSummaryText();
-
   }
 
   e.draw = function() {
@@ -64,10 +64,11 @@ var ecosystem = function( e ) {
     startButton.parent('textContainer');
     startButton.mousePressed(pause);
     population.updateStats();
-    e.sliderRange(0.001, 0.5, 0.001);
+    e.sliderRange(0, 0.5, 0.01);
     gui = e.createGui('controls');
     gui.addGlobals('baseMutationRate');
     gui.addGlobals('debugMode');
+    gui.addGlobals('historyMode');
     gui.hide();
   }
 }

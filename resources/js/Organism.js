@@ -1,8 +1,10 @@
 class Organism {
     constructor(lifespan, dnaLength, id, startingLocation) {
+    this.startingLocation = e.createVector(startingLocation.x, startingLocation.y);
     this.location = e.createVector(startingLocation.x, startingLocation.y);
     this.velocity = e.createVector(0, 0);
     this.acceleration = e.createVector(0, 0);
+    this.locationHistory = []
     this.fitness = 0;
     this.score = 0;
     this.dna = [];
@@ -105,10 +107,6 @@ class Organism {
     // noStroke();
     // Use fitness to calculate area of circle.  Calculate diameter from area.
     let diameter = this.size;
-    if (debugMode) {
-      // const area = e.map(this.fitness, 0, 100, 0, 100)
-      // diameter = e.sqrt(area/e.PI) * 2;
-    }
 
     this.determineColor();
     e.fill(this.color);
@@ -131,6 +129,7 @@ class Organism {
 
   update() {
     debugMode ? this.determineFitness() : null;
+    this.locationHistory.push(e.createVector(this.location.x, this.location.y));
     if (!this.frozen && !this.acheivedGoal && this.alive) {
       this.move();
       this.calculateDistanceTravelled();
