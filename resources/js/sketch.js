@@ -145,7 +145,8 @@ var ecosystem = function( e ) {
     mutationRateSlider = e.createSlider(0.01, 0.5, 0.02, 0.01);
     mutationRateSlider.parent('textContainer');
     mutationRateSlider.style('width', '80px');
-    mutationRateSlider.changed(updateStats)
+    mutationRateSlider.input(updateStats)
+    mutationRateSlider.addClass('mutationSlider')
     startButton = e.createButton('play')
     startButton.parent('sliderContainer');
     startButton.mousePressed(pause);

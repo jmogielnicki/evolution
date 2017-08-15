@@ -46,9 +46,13 @@ p, h2, h1, h3, h4, li, label {
 
 .start {
   background-color: green;
-  width: 80px;
+  width: 90px;
   border-color: white;
   color: white;
+}
+
+.mutationSlider {
+  width: 120px !important;
 }
 
 button {
@@ -77,4 +81,46 @@ select {
   border: solid 2px #c5cfe0;
   border-radius: 6px;
   margin: 0 10px;
+}
+
+input[type="range"]{
+  -webkit-appearance:none;
+  width:120px;
+  height:20px;
+  background: linear-gradient(to right, grey 0%, grey 100%);
+  background-size:150px 10px;
+  background-position:center;
+  background-repeat:no-repeat;
+  overflow:hidden;
+  outline: none;
+}
+
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: -14px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+}
+
+/* All the same stuff for Firefox */
+input[type=range]::-moz-range-thumb {
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* All the same stuff for IE */
+input[type=range]::-ms-thumb {
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
 }
