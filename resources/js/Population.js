@@ -67,9 +67,9 @@ class Population {
       this.mutationRate = 1;
     } else if (this.generation % this.numGenerationsForMRBoost == 0) {
       // Every x generations boost the mutationRate for next generation
-      this.mutationRate = .05;
+      this.mutationRate = 0.03;
     } else {
-      this.mutationRate = 0.01
+      this.mutationRate = 0.03;
     }
   }
 
@@ -174,10 +174,11 @@ class Population {
 
   updateAndDisplay() {
     // TODO consolidate the loops through organisms so we aren't looping multiple times
+    const numberPerStartSet = 10
     if (this.active) {
       this.timer += 1;
       // Generation lifespan is over
-      if (this.timer >= this.lifespan + this.organisms.length) {
+      if (this.timer >= this.lifespan + (this.organisms.length/numberPerStartSet)) {
         this.determineFitness();
         this.recordHistory();
         this.reproduce();
@@ -194,7 +195,7 @@ class Population {
       let organism = this.organisms[i]
       organism.display();
       if (this.active && organism.timer < organism.lifespan) {
-        if (i < this.timer) {
+        if (i < this.timer * numberPerStartSet) {
           organism.update();
         }
       }

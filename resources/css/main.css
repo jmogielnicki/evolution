@@ -6,8 +6,9 @@ canvas {
   border: 1px solid #262626;
 }
 
-p {
+p, h2, h1, h3, h4, li {
   color: lightgrey;
+  line-height: 1.7;
 }
 
 #blue {
@@ -24,4 +25,32 @@ p {
 
 #sliderContainer {
   display: inline-block;
+}
+
+button {
+  color: #c5cfe0;
+  height: 30px;
+  background: rgba(0,0,0,0);
+  border: solid 2px #c5cfe0;
+  border-radius: 6px;
+  margin: 0 10px;
+}
+button:hover,
+button.hover {
+  border-color: #a0a9bc;
+  color: #a0a9bc;
+}
+button:active,
+button.active {
+  border-color: #46484c;
+  color: #46484c;
+}
+
+select {
+  color: #c5cfe0;
+  height: 30px;
+  background: rgba(0,0,0,0);
+  border: solid 2px #c5cfe0;
+  border-radius: 6px;
+  margin: 0 10px;
 }

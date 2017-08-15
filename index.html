@@ -19,13 +19,41 @@
   <body>
   <div id="wrapper">
     <div id="textContainer">
-      <p>A genetic algorithm that learns how to reach a <span id="blue">target. </span>
-        Click to place <span id="red">obstacles</span>
-      </p>
+      <h1>Evolution via Genetic Algorithm</h1>
+      <p>Organisms learn how to reach the <span id="blue">target. </span></p>
+      <p>Click to place <span id="red">obstacles</span> or choose a preset layout</p>
     </div>
     <div id="sliderContainer"></div>
   	<div id="ecosystem"></div> <br>
   	<div id="analysis"></div>
+    <div id="howWorks">
+      <h2>How it works</h2>
+      <ol>
+        <h3>Organisms</h3>
+        <li>Each generation is made up of 500 organisms, which move according to an array of forces which constitutes their "DNA"</li>
+        <li>The first generation is seeded with random DNA, so that each organism will move away from the starting location in a different direction</li>
+        <li>For example, organism A might have DNA that says "move up, then move to the right and down, then down, then to the right, etc"</li>
+        <li>Organism B might have DNA that says "move left, then move up and to the right, then down, then up and to the left, etc"</li>
+        <h3>A Round</h3>
+        <li>When we start the round, each organism moves until their lifespan is up, they hit an obstacle, or they hit the goal.</li>
+        <li>When all organisms lifespans are up, the round is over</li>
+        <h3>Fitness</h3>
+        <li>At the end of each round, fitness is calculated for each organism based on a the following factors:</li>
+        <ul>
+          <li>How close they came to the target (closer is better)</li>
+          <li>Whether or not they hit an obstacle</li>
+          <li>Whether they got closer to the target than any organism has previously</li>
+          <li>Whether they hit the target</li>
+          <li>Whether they hit the target and did so faster than any organism has previously</li>
+        </ul>
+      <li>Each organism's fitness determines how likely they are to be chosen in the next phase: reproduction</li>
+      <h3>Reproduction</h3>
+      <li>During the reproduction phase, we choose two organisms (parents) randomly from a weighted mating pool (fitter organisms are more likely to be chosen)</li>
+      <li>We randomly combine the DNA (the array of forces) of these parents and create a child organism with that combined DNA</li>
+      <li>We apply mutations.  If the mutation rate is 1%, for 1 out of every 100 forces we insert a random force instead of a force from a parent</li>
+      <li>We do this 500 times to create 500 children.  We then kill off the parents (eep) and start a new round with the 500 children</li>
+      </ol>
+    </div>
   </div>
   </body>
 </html>
