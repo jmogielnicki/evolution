@@ -7,8 +7,9 @@ var goal;
 var population;
 var generationText, mutationRateText, mutationRateSlider, startButton;
 var onCanvas;
+var mutationRateSlider;
 var gui;
-var baseMutationRate = 0.01;
+var baseMutationRate = 0.02;
 var debugMode = false;
 var historyMode = false;
 var showPaths = false;
@@ -124,13 +125,31 @@ var ecosystem = function( e ) {
     }
   }
 
+  updateStats = function() {
+    baseMutationRate = mutationRateSlider.value();
+    population.updateStats();
+  }
+
+  changeDebugMode = function() {
+    debugMode = !debugMode;
+  }
+
+  changeHistoryMode = function() {
+    historyMode = !historyMode;
+  }
+
   e.createSummaryText = function() {
     generationText = e.createP('');
     generationText.addClass('generationText');
     generationText.parent('textContainer');
+    mutationRateSlider = e.createSlider(0.01, 0.5, 0.02, 0.01);
+    mutationRateSlider.parent('textContainer');
+    mutationRateSlider.style('width', '80px');
+    mutationRateSlider.changed(updateStats)
     startButton = e.createButton('play')
     startButton.parent('sliderContainer');
     startButton.mousePressed(pause);
+    startButton.addClass('start');
     sel = e.createSelect();
     sel.parent('sliderContainer');
     sel.option('choose preset');
@@ -138,6 +157,12 @@ var ecosystem = function( e ) {
     sel.option('walls');
     sel.option('scatter');
     sel.changed(choosePreset);
+    debugCheckbox = e.createCheckbox('debug mode', false);
+    debugCheckbox.parent('sliderContainer');
+    debugCheckbox.changed(changeDebugMode);
+    historyModeCheckbox = e.createCheckbox('history mode', false);
+    historyModeCheckbox.parent('sliderContainer');
+    historyModeCheckbox.changed(changeHistoryMode);
     resetButton = e.createButton('reset')
     resetButton.parent('sliderContainer');
     resetButton.mousePressed(reset);

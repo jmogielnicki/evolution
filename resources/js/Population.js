@@ -4,7 +4,6 @@ class Population {
     this.organisms = [];
     this.nextGeneration = [];
     this.generation = 0;
-    this.mutationRate = 0.01;
     this.timer = 0;
     this.lifespan = lifespan;
     this.startingLocation = {x: 100, y: e.height/2};
@@ -64,12 +63,12 @@ class Population {
     }
     // if all members are stuck, boost the mutationRate to 100% for next generation
     if (this.totalUnstuck == 0) {
-      this.mutationRate = 1;
+      baseMutationRate = 1;
     } else if (this.generation % this.numGenerationsForMRBoost == 0) {
       // Every x generations boost the mutationRate for next generation
-      this.mutationRate = 0.03;
+      // baseMutationRate = 0.02;
     } else {
-      this.mutationRate = 0.03;
+      // baseMutationRate = 0.02;
     }
   }
 
@@ -103,7 +102,7 @@ class Population {
           offspring.dna[j] = mate2.dna[j];
         }
       }
-      offspring.mutate(guiVisible ? baseMutationRate : this.mutationRate);
+      offspring.mutate(guiVisible ? baseMutationRate : baseMutationRate);
       this.nextGeneration.push(offspring);
     }
     this.organisms = this.nextGeneration;
@@ -137,7 +136,8 @@ class Population {
       'Generation: ' + genNum + spacer +
       'Total Population: ' + this.organisms.length + spacer +
       '# successful: ' + this.totalCompleted + ' (' + pctComplete + ')' + spacer +
-      '# died: ' + numDied + ' (' + pctDied + ')'
+      '# died: ' + numDied + ' (' + pctDied + ')' + spacer +
+      'Mutation Rate: ' + Math.floor(baseMutationRate * 100) + '%'
       )
   }
 

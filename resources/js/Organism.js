@@ -84,6 +84,7 @@ class Organism {
   }
 
   mutate(mutationRate) {
+    console.log(mutationRate);
     for (var i = 0; i < this.dna.length; i++) {
       if (e.random() <= mutationRate) {
         this.dna[i] = this.createRandomVector();

@@ -6,9 +6,17 @@ canvas {
   border: 1px solid #262626;
 }
 
-p, h2, h1, h3, h4, li {
+p, h2, h1, h3, h4, li, label {
   color: lightgrey;
-  line-height: 1.7;
+  line-height: 1.5;
+}
+
+.generationText {
+  margin: 0 0 9px 0;
+}
+
+#wrapper {
+  margin-left: 16px;
 }
 
 #blue {
@@ -25,6 +33,22 @@ p, h2, h1, h3, h4, li {
 
 #sliderContainer {
   display: inline-block;
+}
+
+#sliderContainer div {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+#ecosystem {
+  margin-top: 16px;
+}
+
+.start {
+  background-color: green;
+  width: 80px;
+  border-color: white;
+  color: white;
 }
 
 button {
